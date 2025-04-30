@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: gateway-service
-        image: 124355653119.dkr.ecr.eu-north-1.amazonaws.com/gateway-service:latest
+        image: 124355653119.dkr.ecr.us-east-1.amazonaws.com/gateway-service:latest
         ports: [{ containerPort: 80 }]
 
 ---
