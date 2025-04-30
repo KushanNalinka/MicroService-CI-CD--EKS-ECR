@@ -1,0 +1,23 @@
+# dependencies
+node_modules
+npm-debug.log
+
+# local env files
+.env
+.env.local
+
+# build output
+dist
+build
+
+# Docker build files
+Dockerfile
+.dockerignore
+
+# git metadata
+.git
+.gitignore
+
+# editor/project files
+.vscode
+.idea
