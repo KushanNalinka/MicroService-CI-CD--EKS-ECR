@@ -48,5 +48,5 @@ mongoose.connection.once('open', () => {
 })
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the Kushan Service!');
+    res.send('Welcome to the Kushan Colomo Service!');
 });
