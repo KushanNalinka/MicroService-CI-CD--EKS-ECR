@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it21467448-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: it21467448-service }
+  template:
+    metadata:
+      labels: { app: it21467448-service }
+    spec:
+      containers:
+      - name: it21467448-service
+        image: 124355653119.dkr.ecr.eu-north-1.amazonaws.com/it21467448-service:latest
+        ports: [{ containerPort: 8003 }]
+        env:
+        - name: PORT
+          value: "8003"
+        - name: MONGO_URI
+          valueFrom: { secretKeyRef: { name: it21467448-secrets, key: MONGO_URI } }
+        - name: ACCESS_TOKEN_SECRET
+          valueFrom: { secretKeyRef: { name: it21467448-secrets, key: ACCESS_TOKEN_SECRET } }
+        - name: REFRESH_TOKEN_SECRET
+          valueFrom: { secretKeyRef: { name: it21467448-secrets, key: REFRESH_TOKEN_SECRET } }
+        - name: GOOGLE_CLIENT_ID
+          valueFrom: { secretKeyRef: { name: it21467448-secrets, key: GOOGLE_CLIENT_ID } }
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom: { secretKeyRef: { name: it21467448-secrets, key: GOOGLE_CLIENT_SECRET } }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: it21467448-service
+spec:
+  selector: { app: it21467448-service }
+  ports:
+  - port: 8003
+    targetPort: 8003
+  type: ClusterIP

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: it21311772-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: it21311772-service }
+  template:
+    metadata:
+      labels: { app: it21311772-service }
+    spec:
+      containers:
+      - name: it21311772-service
+        image: 124355653119.dkr.ecr.eu-north-1.amazonaws.com/it21311772-service:latest
+        ports: [{ containerPort: 8002 }]
+        env:
+        - name: PORT
+          value: "8002"
+        - name: MONGO_URI
+          valueFrom: { secretKeyRef: { name: it21311772-secrets, key: MONGO_URI } }
+        - name: ACCESS_TOKEN_SECRET
+          valueFrom: { secretKeyRef: { name: it21311772-secrets, key: ACCESS_TOKEN_SECRET } }
+        - name: REFRESH_TOKEN_SECRET
+          valueFrom: { secretKeyRef: { name: it21311772-secrets, key: REFRESH_TOKEN_SECRET } }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: it21311772-service
+spec:
+  selector: { app: it21311772-service }
+  ports:
+  - port: 8002
+    targetPort: 8002
+  type: ClusterIP

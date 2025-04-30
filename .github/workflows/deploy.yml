@@ -1,3 +1,50 @@
+name: Deploy to EKS
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  id-token: write   # OIDC
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS creds (OIDC)
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
+
+    - name: Build/Tag/Push all images
+      run: |
+        # List of folders = list of images
+        for DIR in Gateway IT21310546 IT21311772 IT21467448 IT21894510; do
+          IMG=$(echo "$DIR" | tr '[:upper:]' '[:lower:]')-service
+          docker build -t $IMG ./$DIR
+          docker tag $IMG:latest 124355653119.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$IMG:latest
+          docker push 124355653119.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$IMG:latest
+        done
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_REGION }} \
+            --name nodejs-microservices
+
+    - name: Apply Kubernetes manifests
+      run: kubectl apply -f k8s/
 
 
 
