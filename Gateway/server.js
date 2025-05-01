@@ -29,10 +29,10 @@ app.use(bodyParser.json());
 app.get('/health', (_req, res) => res.send('OK'));
 
 // proxy rules
-app.use('/service1', createProxyMiddleware({ target: 'http://it21310546-service:8001', changeOrigin: true }));
-app.use('/service2', createProxyMiddleware({ target: 'http://it21311772-service:8002', changeOrigin: true }));
-app.use('/service3', createProxyMiddleware({ target: 'http://it21467448-service:8003', changeOrigin: true }));
-app.use('/service4', createProxyMiddleware({ target: 'http://it21894510-service:8004', changeOrigin: true }));
+app.use('/service1', createProxyMiddleware({ target: 'http://it21310546-service:8001', changeOrigin: true,   pathRewrite: { '^/service1': '' }  }));
+app.use('/service2', createProxyMiddleware({ target: 'http://it21311772-service:8002', changeOrigin: true, pathRewrite: { '^/service2': '' } }));
+app.use('/service3', createProxyMiddleware({ target: 'http://it21467448-service:8003', changeOrigin: true, pathRewrite: { '^/service3': '' } }));
+app.use('/service4', createProxyMiddleware({ target: 'http://it21894510-service:8004', changeOrigin: true, pathRewrite: { '^/service4': '' } }));
 
 app.listen(process.env.PORT || 80, () => {
   console.log('Gateway listening');
