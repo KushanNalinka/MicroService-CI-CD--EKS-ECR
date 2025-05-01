@@ -22,7 +22,7 @@ jobs:
 
     - name: Build, tag & push
       run: |
-        ACC=124355653119
+        ACC=952247584776
         for DIR in Gateway IT21310546 IT21311772 IT21467448 IT21894510; do
           IMG=$(echo "$DIR" | tr '[:upper:]' '[:lower:]')-service
           docker build -t $IMG ./$DIR

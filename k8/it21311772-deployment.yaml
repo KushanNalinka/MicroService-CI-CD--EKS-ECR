@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: it21311772-service
-        image: 124355653119.dkr.ecr.us-east-1.amazonaws.com/it21311772-service:latest
+        image: 952247584776.dkr.ecr.us-east-1.amazonaws.com/it21311772-service:latest
         ports: [{ containerPort: 8002 }]
         env:
         - name: PORT
