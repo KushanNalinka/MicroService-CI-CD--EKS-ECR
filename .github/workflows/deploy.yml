@@ -1,58 +1,38 @@
 name: Deploy to EKS
-
-on:
-  push:
-    branches: [ main ]          # run every time you push to main
+on: [push]
 
 permissions:
-  id-token: write               # OIDC for short-lived AWS creds
+  id-token: write
   contents: read
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }} 
+      AWS_REGION: ${{ secrets.AWS_REGION }}    # makes it available to all steps
     steps:
-    # 1 — checkout repo
     - uses: actions/checkout@v3
 
-    # 2 — configure AWS credentials via OIDC
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+    - uses: aws-actions/configure-aws-credentials@v2
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-        aws-region:      ${{ secrets.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION }}
 
-     - uses: aws-actions/amazon-ecr-login@v1
+    - uses: aws-actions/amazon-ecr-login@v1     # logs in to 124355653119.dkr.ecr.us-east-1.amazonaws.com
 
-    # 3 — login to the correct ECR registry
-    - name: Login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: 'true'
-
-    # 4 — build, tag and push every service folder
-    - name: Build → Tag → Push Docker images
+    - name: Build, tag & push
       run: |
+        ACC=124355653119
         for DIR in Gateway IT21310546 IT21311772 IT21467448 IT21894510; do
           IMG=$(echo "$DIR" | tr '[:upper:]' '[:lower:]')-service
           docker build -t $IMG ./$DIR
-          docker tag  $IMG:latest \
-            124355653119.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$IMG:latest
-          docker push 124355653119.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$IMG:latest
+          docker tag   $IMG:latest $ACC.dkr.ecr.$AWS_REGION.amazonaws.com/$IMG:latest
+          docker push  $ACC.dkr.ecr.$AWS_REGION.amazonaws.com/$IMG:latest
         done
 
-    # 5 — install kubectl
     - uses: azure/setup-kubectl@v4
 
-    # 6 — pull kubeconfig for the cluster
-    - name: Update kubeconfig
+    - name: Update kubeconfig & apply
       run: |
-        aws eks update-kubeconfig \
-          --region ${{ secrets.AWS_REGION }} \
-          --name nodejs-microservices
-
-    # 7 — apply all manifests in k8s/
-    - name: Apply Kubernetes manifests
-      run: kubectl apply -f k8s/
+        aws eks update-kubeconfig --name nodejs-microservices --region $AWS_REGION
+        kubectl apply -f k8s/
