@@ -45,5 +45,5 @@ mongoose.connection.once('open', () => {
 })
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the Nayali Kandy Service!');
+    res.send('Welcome to  Nayali Kandy Service!');
 });
