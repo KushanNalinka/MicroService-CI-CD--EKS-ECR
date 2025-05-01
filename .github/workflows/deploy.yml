@@ -11,7 +11,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }} 
     steps:
     # 1 — checkout repo
     - uses: actions/checkout@v3
@@ -22,6 +23,8 @@ jobs:
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
         aws-region:      ${{ secrets.AWS_REGION }}
+
+     - uses: aws-actions/amazon-ecr-login@v1
 
     # 3 — login to the correct ECR registry
     - name: Login to Amazon ECR
