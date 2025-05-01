@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import proxy from "express-http-proxy";
 import bodyParser from "body-parser";
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 
 app.use(cors());
